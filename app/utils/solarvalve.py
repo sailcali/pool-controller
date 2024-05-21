@@ -46,24 +46,26 @@ class SolarValve:
         else:
             self.close_valve()
     
-    def open_valve(self):
+    def open_valve(self, delay=0):
         if self.position == 0:
             GPIO.output(VALVE_PIN, True)
             self.position = 1
             logging("Solar valve open!")
             self.last_valve_change = 0
             self.temp_range = self.config["temp_range_for_close"]
+            self.delay=delay
             return True
         else:
             return False
             
-    def close_valve(self):
+    def close_valve(self, delay=0):
         if self.position == 1:
             GPIO.output(VALVE_PIN, False)
             self.position = 0
             logging("Solar valve closed!")
             self.last_valve_change = 0
             self.temp_range = self.config["temp_range_for_open"]
+            self.delay=delay
             return True
         else:
             return False
