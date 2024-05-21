@@ -1,9 +1,9 @@
-# try:
-#     # from machine import Pin, SPI
-#     # from mcp3008 import MCP3008 as MCP
-#     # spi = SPI(1, sck=Pin(23),mosi=Pin(19),miso=Pin(21), baudrate=100000)
-#     # cs = Pin(24, Pin.OUT)
-#     # cs.value(1) # Pin enable
+
+from machine import Pin, SPI
+from .mcp3008 import MCP3008 as MCP
+spi = SPI(1, sck=Pin(23),mosi=Pin(19),miso=Pin(21), baudrate=100000)
+cs = Pin(24, Pin.OUT)
+cs.value(1) # Pin enable
 
 # except Exception:
     # pass
@@ -18,7 +18,7 @@ WATER_SENSOR = 7
 class Sensors:
     """Main object which SETS and GETS the status of all onboard sensors"""
     def __init__(self):
-        self.chip = MCP()
+        self.chip = MCP(spi,cs)
 
         self.temps = {0:[],1:[]} # 0 = water temp, 1 = roof temp
         self.water_temp = 0

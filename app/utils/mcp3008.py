@@ -1,72 +1,68 @@
-# try:
-#     import machine
-#     prod = True
-# except Exception:
-#     prod = False
-
-# class MCP3008:
-
-#     def __init__(self, spi, cs, ref_voltage=3.3):
-#         """
-#         Create MCP3008 instance
-
-#         Args:
-#             spi: configured SPI bus
-#             cs:  pin to use for chip select
-#             ref_voltage: r
-#         """
-#         self.cs = cs
-#         self.cs.value(1) # ncs on
-#         self._spi = spi
-#         self._out_buf = bytearray(3)
-#         self._out_buf[0] = 0x01
-#         self._in_buf = bytearray(3)
-#         self._ref_voltage = ref_voltage
-
-#     def reference_voltage(self) -> float:
-#         """Returns the MCP3xxx's reference voltage as a float."""
-#         return self._ref_voltage
-
-#     def read(self, pin, is_differential=False):
-#         """
-#         read a voltage or voltage difference using the MCP3008.
-
-#         Args:
-#             pin: the pin to use
-#             is_differential: if true, return the potential difference between two pins,
-
-
-#         Returns:
-#             voltage in range [0, 1023] where 1023 = VREF (3V3)
-
-#         """
-
-#         self.cs.value(0) # select
-#         self._out_buf[1] = ((not is_differential) << 7) | (pin << 4)
-#         self._spi.write_readinto(self._out_buf, self._in_buf)
-#         self.cs.value(1) # turn off
-#         return ((self._in_buf[1] & 0x03) << 8) | self._in_buf[2]
-
-try:
-    from spidev import SpiDev
-except Exception:
-    pass
+import machine
 
 class MCP3008:
-    def __init__(self, bus = 0, device = 0):
-        self.bus, self.device = bus, device
-        self.spi = SpiDev()
-        self.open()
-        self.spi.max_speed_hz = 1000000 # 1MHz
+
+    def __init__(self, spi, cs, ref_voltage=3.3):
+        """
+        Create MCP3008 instance
+
+        Args:
+            spi: configured SPI bus
+            cs:  pin to use for chip select
+            ref_voltage: r
+        """
+        self.cs = cs
+        self.cs.value(1) # ncs on
+        self._spi = spi
+        self._out_buf = bytearray(3)
+        self._out_buf[0] = 0x01
+        self._in_buf = bytearray(3)
+        self._ref_voltage = ref_voltage
+
+    def reference_voltage(self) -> float:
+        """Returns the MCP3xxx's reference voltage as a float."""
+        return self._ref_voltage
+
+    def read(self, pin, is_differential=False):
+        """
+        read a voltage or voltage difference using the MCP3008.
+
+        Args:
+            pin: the pin to use
+            is_differential: if true, return the potential difference between two pins,
+
+
+        Returns:
+            voltage in range [0, 1023] where 1023 = VREF (3V3)
+
+        """
+
+        self.cs.value(0) # select
+        self._out_buf[1] = ((not is_differential) << 7) | (pin << 4)
+        self._spi.write_readinto(self._out_buf, self._in_buf)
+        self.cs.value(1) # turn off
+        return ((self._in_buf[1] & 0x03) << 8) | self._in_buf[2]
+
+# try:
+#     from spidev import SpiDev
+# except Exception:
+#     pass
+
+# class MCP3008:
+#     def __init__(self, bus = 0, device = 0):
+#         self.bus, self.device = bus, device
+#         self.spi = SpiDev()
+#         self.open()
+#         self.spi.max_speed_hz = 1000000 # 1MHz
  
-    def open(self):
-        self.spi.open(self.bus, self.device)
-        self.spi.max_speed_hz = 1000000 # 1MHz
+#     def open(self):
+#         self.spi.open(self.bus, self.device)
+#         self.spi.max_speed_hz = 1000000 # 1MHz
     
-    def read(self, channel = 0):
-        adc = self.spi.xfer2([1, (8 + channel) << 4, 0])
-        data = ((adc[1] & 3) << 8) + adc[2]
-        return data
+#     def read(self, channel = 0):
+#         adc = self.spi.xfer2([1, (8 + channel) << 4, 0])
+#         data = ((adc[1] & 3) << 8) + adc[2]
+#         return data
             
-    def close(self):
-        self.spi.close()
+#     def close(self):
+#         self.spi.close()
