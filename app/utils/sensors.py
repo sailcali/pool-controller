@@ -1,13 +1,3 @@
-# try:
-#     # from machine import Pin, SPI
-#     # from mcp3008 import MCP3008 as MCP
-#     # spi = SPI(1, sck=Pin(23),mosi=Pin(19),miso=Pin(21), baudrate=100000)
-#     # cs = Pin(24, Pin.OUT)
-#     # cs.value(1) # Pin enable
-
-# except Exception:
-    # pass
-
 from .mcp3008 import MCP3008 as MCP
 import math
 
