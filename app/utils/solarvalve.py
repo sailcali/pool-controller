@@ -1,12 +1,8 @@
-try:
-    import RPi.GPIO as GPIO
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setwarnings(False)
-    prod = True
-except Exception:
-    prod = False
-
+import RPi.GPIO as GPIO
 from .logging import logging
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 
 VALVE_PIN = 17
 
@@ -18,8 +14,7 @@ class SolarValve:
             'temp_range_for_open': 20, 
             'temp_range_for_close': -1, 
             'seconds_cal': 1}
-        if prod:
-            GPIO.setup(VALVE_PIN, GPIO.OUT)
+        GPIO.setup(VALVE_PIN, GPIO.OUT)
         self.position = 0
         self.delay = 0
         self.last_valve_change = self.config['min_cycle_time'] # init @ min cycle time
@@ -53,8 +48,7 @@ class SolarValve:
     
     def open_valve(self):
         if self.position == 0:
-            if prod:
-                GPIO.output(VALVE_PIN, True)
+            GPIO.output(VALVE_PIN, True)
             self.position = 1
             logging("Solar valve open!")
             self.last_valve_change = 0
@@ -65,8 +59,7 @@ class SolarValve:
             
     def close_valve(self):
         if self.position == 1:
-            if prod:
-                GPIO.output(VALVE_PIN, False)
+            GPIO.output(VALVE_PIN, False)
             self.position = 0
             logging("Solar valve closed!")
             self.last_valve_change = 0

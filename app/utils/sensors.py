@@ -8,7 +8,7 @@
 # except Exception:
     # pass
 
-from mcp3008 import MCP3008 as MCP
+from .mcp3008 import MCP3008 as MCP
 import math
 
 # Roof is ADC ch 0 and water is ADC ch 7
@@ -18,10 +18,7 @@ WATER_SENSOR = 7
 class Sensors:
     """Main object which SETS and GETS the status of all onboard sensors"""
     def __init__(self):
-        try:
-            self.chip = MCP()
-        except Exception:
-            pass
+        self.chip = MCP()
 
         self.temps = {0:[],1:[]} # 0 = water temp, 1 = roof temp
         self.water_temp = 0
@@ -29,11 +26,7 @@ class Sensors:
     
     def refresh_temps(self):
         """This is run every second to update the current temps"""
-        try:
-            adcs = [self.chip.read(WATER_SENSOR), self.chip.read(ROOF_SENSOR)]
-        except Exception:
-            self.water_temp += 1
-            return
+        adcs = [self.chip.read(WATER_SENSOR), self.chip.read(ROOF_SENSOR)]
 
         i = 0 # i tracks which adc number we are on in the list
         for adc in adcs:
