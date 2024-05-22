@@ -30,11 +30,10 @@ class Maintainer(threading.Thread):
                     try:
                         response = requests.post("http://192.168.86.205/pool/status", json={"data":self.standard_response()})
                         response.close()
-                        upload_seconds = 0
+                        upload_seconds = -1
                     except OSError:
                         logging("Pool could not connect to RASPI server!\n")
-                else:
-                    upload_seconds += 1
+                upload_seconds += 1
                 # Wait time between cycles is about 1 second (accounts for run time)
                 time.sleep(self.valve.config['seconds_cal'])
                 # Tracking the last valve change value
