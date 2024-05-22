@@ -12,10 +12,20 @@ def get_status():
 def change_valve():
     """Manually opens or closes the solar valve"""
     body = request.get_json()
+    try:
+        delay = body['delay']
+    except KeyError:
+        delay = 90
     if body['valve'] == True:
-        valve.open_valve(delay=90)
+        if valve.position == 0:
+            valve.open_valve(delay=delay)
+        else:
+            return jsonify({'error': 'valve already open'}), 400
     elif body['valve'] == False:
-        valve.close_valve(delay=90)
+        if valve.position == 1:
+            valve.close_valve(delay=delay)
+        else:
+            return jsonify({'error': 'valve already closed'}), 400
     data = {**sensors.data(), **valve.data()}
     return jsonify({'data': data}), 201
 
