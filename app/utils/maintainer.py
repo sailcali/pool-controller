@@ -16,9 +16,8 @@ class Maintainer(threading.Thread):
             "temp_range": self.valve.temp_range, "max_hit_delay":self.valve.max_temp_hit_delay}
 
     def run(self):
+        upload_seconds = 0
         while True:
-            
-            upload_seconds = 0
             try:
                 
                 # Refresh the current temperatures

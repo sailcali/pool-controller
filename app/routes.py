@@ -6,7 +6,7 @@ pool_bp = Blueprint('pool_bp', __name__, url_prefix='/')
 def get_status():
     """Returns the current pool status"""
     data = {**sensors.data(), **valve.data()}
-    return jsonify(data, 200)
+    return jsonify({'data': data}, 200)
 
 @pool_bp.route('/valve', methods=['POST'])
 def change_valve():
@@ -17,11 +17,11 @@ def change_valve():
     elif body['valve'] == False:
         valve.close_valve(delay=90)
     data = {**sensors.data(), **valve.data()}
-    return jsonify(data, 201)
+    return jsonify({'data': data}, 201)
 
 @pool_bp.route('/temp', methods=['POST'])
 def set_temp():
     body = request.get_json()
     valve.config['max_water_temp'] = body['setting']
     data = {**sensors.data(), **valve.data()}
-    return jsonify(data, 201)
+    return jsonify({'data': data}, 201)
