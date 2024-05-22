@@ -15,6 +15,7 @@ class SolarValve:
             'temp_range_for_close': -1, 
             'seconds_cal': 1}
         GPIO.setup(VALVE_PIN, GPIO.OUT)
+        GPIO.output(VALVE_PIN, False)
         self.position = 0
         self.delay = 0
         self.last_valve_change = self.config['min_cycle_time'] # init @ min cycle time
