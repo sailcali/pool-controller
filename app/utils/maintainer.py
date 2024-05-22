@@ -29,6 +29,7 @@ class Maintainer(threading.Thread):
                 if upload_seconds >= 60:
                     try:
                         response = requests.post("http://192.168.86.205/pool/status", json={"data":self.standard_response()})
+                        response.close()
                         upload_seconds = 0
                     except OSError:
                         logging("Pool could not connect to RASPI server!\n")
