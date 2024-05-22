@@ -17,15 +17,21 @@ def change_valve():
     except KeyError:
         delay = 90
     if body['valve'] == True:
-        if valve.position == 0:
-            valve.open_valve(delay=delay)
-        else:
+        if valve.position == 1:
             return jsonify({'error': 'valve already open'}), 400
+        elif valve.last_valve_change < valve.config['min_cycle_time']:
+            return jsonify({'error': 'last valve change was too recent'}), 400
+        else:
+            valve.open_valve(delay=delay)
+
     elif body['valve'] == False:
         if valve.position == 1:
-            valve.close_valve(delay=delay)
-        else:
             return jsonify({'error': 'valve already closed'}), 400
+        elif valve.last_valve_change < valve.config['min_cycle_time']:
+            return jsonify({'error': 'last valve change was too recent'}), 400
+        else:
+            valve.close_valve(delay=delay)
+
     data = {**sensors.data(), **valve.data()}
     return jsonify({'data': data}), 201
 
