@@ -44,9 +44,10 @@ class SolarValve:
         # User requested manual valve change
         if self.position == 0 and GPIO.input(VALVE_PIN) == 1:
             self._close_valve()
+            return
         elif self.position == 1 and GPIO.input(VALVE_PIN) == 0:
             self._open_valve()
-
+            return
 
         # If the roof temp is above the current registered warm value, make sure it get opened, otherwise closed
         if sensors.roof_temp > sensors.water_temp + self.temp_range:
@@ -57,26 +58,24 @@ class SolarValve:
     def current_state(self):
         return GPIO.input(VALVE_PIN)
 
-    def _open_valve(self, delay=0):
-        if self.position == 0:
+    def _open_valve(self):
+        if self.current_state() == 0:
             GPIO.output(VALVE_PIN, True)
             self.position = 1
             logging("Solar valve open!")
             self.last_valve_change = 0
             self.temp_range = self.config["temp_range_for_close"]
-            self.delay=delay
             return True
         else:
             return False
             
-    def _close_valve(self, delay=0):
-        if self.position == 1:
+    def _close_valve(self):
+        if self.current_state() == 1:
             GPIO.output(VALVE_PIN, False)
             self.position = 0
             logging("Solar valve closed!")
             self.last_valve_change = 0
             self.temp_range = self.config["temp_range_for_open"]
-            self.delay=delay
             return True
         else:
             return False
