@@ -26,7 +26,7 @@ def change_valve():
             valve.delay = delay
 
     elif body['valve'] == False:
-        if valve.position == 1:
+        if valve.position == 0:
             return jsonify({'error': 'valve already closed'}), 400
         elif valve.last_valve_change < valve.config['min_cycle_time']:
             return jsonify({'error': 'last valve change was too recent'}), 400
