@@ -16,8 +16,8 @@ class SolarValve:
             'seconds_cal': 1}
         GPIO.setup(VALVE_PIN, GPIO.OUT)
         GPIO.output(VALVE_PIN, False)
-        self.position = 0
-        self.delay = 0
+        self.position = 0 # This is the requested position, not necessarily the ACTUAL position
+        self.delay = 0 # User requested delay in programming
         self.last_valve_change = self.config['min_cycle_time'] # init @ min cycle time
         self.max_temp_hit_delay = 0 # this will jump to 43200 (12 hrs) if max temp is hit
         self.temp_range = self.config['temp_range_for_open'] # init at the closed setting (high)
@@ -41,13 +41,20 @@ class SolarValve:
             self.max_temp_hit_delay = 43200
             return
         
+        # User requested manual valve change
+        if self.position == 0 and GPIO.input(VALVE_PIN) == 1:
+            self._close_valve()
+        elif self.position == 1 and GPIO.input(VALVE_PIN) == 0:
+            self._open_valve()
+
+
         # If the roof temp is above the current registered warm value, make sure it get opened, otherwise closed
         if sensors.roof_temp > sensors.water_temp + self.temp_range:
-            self.open_valve()
+            self._open_valve()
         else:
-            self.close_valve()
+            self._close_valve()
     
-    def open_valve(self, delay=0):
+    def _open_valve(self, delay=0):
         if self.position == 0:
             GPIO.output(VALVE_PIN, True)
             self.position = 1
@@ -59,7 +66,7 @@ class SolarValve:
         else:
             return False
             
-    def close_valve(self, delay=0):
+    def _close_valve(self, delay=0):
         if self.position == 1:
             GPIO.output(VALVE_PIN, False)
             self.position = 0
@@ -72,6 +79,6 @@ class SolarValve:
             return False
     
     def data(self):
-        return {"valve": self.position, 'delay': self.delay,
+        return {"valve": GPIO.input(VALVE_PIN), 'delay': self.delay,
                     "last_change": self.last_valve_change, "set_temp": self.config['max_water_temp'],
                     "temp_range": self.temp_range, "max_hit_delay":self.max_temp_hit_delay}
