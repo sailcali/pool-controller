@@ -25,8 +25,8 @@ class SolarValve:
     def set_valve(self, sensors):
         """This is run every second to update the valve setting"""
         
-        # First guard clause is for if a valve change delay was initiated manually or we are within the cycle limit set by config
-        if self.delay > 0 or self.last_valve_change < self.config['min_cycle_time']:
+        # First guard clause is for if we are within the cycle limit set by config
+        if self.last_valve_change < self.config['min_cycle_time']:
             return
         
         # Second guard clause will stop any further valve action for 12 hrs once max temp is hit (this also operates the counter)
@@ -47,6 +47,9 @@ class SolarValve:
             return
         elif self.position == 1 and GPIO.input(VALVE_PIN) == 0:
             self._open_valve()
+            return
+
+        if self.delay > 0:
             return
 
         # If the roof temp is above the current registered warm value, make sure it get opened, otherwise closed
