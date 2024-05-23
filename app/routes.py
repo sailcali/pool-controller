@@ -13,7 +13,7 @@ def change_valve():
     """Manually opens or closes the solar valve"""
     body = request.get_json()
     try:
-        delay = body['delay']
+        delay = int(body['delay'])
     except KeyError:
         delay = 90
     if body['valve'] == True:
@@ -22,7 +22,8 @@ def change_valve():
         elif valve.last_valve_change < valve.config['min_cycle_time']:
             return jsonify({'error': 'last valve change was too recent'}), 400
         else:
-            valve.open_valve(delay=delay)
+            valve.position = 1
+            valve.delay = delay
 
     elif body['valve'] == False:
         if valve.position == 1:
@@ -30,7 +31,8 @@ def change_valve():
         elif valve.last_valve_change < valve.config['min_cycle_time']:
             return jsonify({'error': 'last valve change was too recent'}), 400
         else:
-            valve.close_valve(delay=delay)
+            valve.position = 0
+            valve.delay = delay
 
     data = {**sensors.data(), **valve.data()}
     return jsonify({'data': data}), 201

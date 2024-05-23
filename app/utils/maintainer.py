@@ -11,7 +11,7 @@ class Maintainer(threading.Thread):
 
     def standard_response(self):
         return {"water_temp": self.sensors.water_temp, "roof_temp": self.sensors.roof_temp,
-            "valve": self.valve.position, 'delay': self.valve.delay,
+            "valve": self.valve.current_state(), 'delay': self.valve.delay,
             "last_change": self.valve.last_valve_change, "set_temp": self.valve.config['max_water_temp'],
             "temp_range": self.valve.temp_range, "max_hit_delay":self.valve.max_temp_hit_delay}
 
