@@ -54,7 +54,7 @@ class SolarValve:
         else:
             self._close_valve()
     
-    def current_state():
+    def current_state(self):
         return GPIO.input(VALVE_PIN)
 
     def _open_valve(self, delay=0):
