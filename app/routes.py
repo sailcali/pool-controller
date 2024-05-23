@@ -38,6 +38,6 @@ def change_valve():
 @pool_bp.route('/temp', methods=['POST'])
 def set_temp():
     body = request.get_json()
-    valve.config['max_water_temp'] = body['setting']
+    valve.config['max_water_temp'] = int(body['setting'])
     data = {**sensors.data(), **valve.data()}
     return jsonify({'data': data}), 201

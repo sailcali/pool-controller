@@ -17,9 +17,11 @@ class Maintainer(threading.Thread):
 
     def run(self):
         upload_seconds = 0
+        errors = 0
         while True:
             try:
-                
+                if errors > 0:
+                    errors -= 1
                 # Refresh the current temperatures
                 self.sensors.refresh_temps()
                 # Go through algorithm to check for valve change
@@ -42,4 +44,7 @@ class Maintainer(threading.Thread):
                     self.valve.delay -= 1
                 
             except Exception as e:
+                errors += 1
                 logging(f"Pool valve error: {e}\n")
+                if errors > 20:
+                    break
