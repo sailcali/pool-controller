@@ -17,10 +17,10 @@ valve = SolarValve()
 def create_app():
     app = Flask(__name__)
     
-    DISCORD.post("Server running")
+    DISCORD.post(content="Server running")
     maintainer = Maintainer(sensors, valve)
     maintainer.start()
-    DISCORD.post("Maintainer running")
+    DISCORD.post(content="Maintainer running")
 
     from .routes import pool_bp
 
