@@ -1,6 +1,9 @@
 # import requests
 from discordwebhook import Discord
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
