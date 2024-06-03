@@ -63,11 +63,11 @@ def set_temp():
 def start_timer():
     """This allows the user to request auto valve control"""
     MAINTAINER = Maintainer(sensors, valve)
-    body = request.get_json()
-    try:
-        MAINTAINER.upload_flag = body['upload']
-    except KeyError:
-        pass
+    # body = request.get_json()
+    # try:
+    #     MAINTAINER.upload_flag = body['upload']
+    # except KeyError:
+    #     pass
 
     MAINTAINER.start()
     DISCORD.post(content="Maintainer running")
