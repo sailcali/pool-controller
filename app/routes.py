@@ -7,17 +7,13 @@ from .utils.maintainer import Maintainer
 
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/')
 
-MAINTAINER = None
+MAINTAINER = Maintainer(sensors, valve)
 
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
 def standard_response():
-    if MAINTAINER != None:
-        maint = MAINTAINER.is_alive()
-    else:
-        maint = False
-    return {**sensors.data(), **valve.data(), "auto_running":maint}
+    return {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
 
 @pool_bp.route('/', methods=['GET'])
 def get_status():
@@ -62,12 +58,12 @@ def set_temp():
 @pool_bp.route('/start-auto', methods=['POST'])
 def start_timer():
     """This allows the user to request auto valve control"""
-    MAINTAINER = Maintainer(sensors, valve)
-    body = request.get_json()
-    try:
-        MAINTAINER.upload_flag = body['upload']
-    except KeyError:
-        pass
+    
+    # body = request.get_json()
+    # try:
+        # MAINTAINER.upload_flag = body['upload']
+    # except KeyError:
+        # pass
 
     MAINTAINER.start()
     DISCORD.post(content="Maintainer running")
