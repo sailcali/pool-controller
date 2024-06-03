@@ -8,6 +8,8 @@ class Maintainer(threading.Thread):
         super(Maintainer, self).__init__()
         self.sensors = sensors
         self.valve = valve
+        self.stop_sign = False
+        self.upload_flag = True
 
     def standard_response(self):
         return {"water_temp": self.sensors.water_temp, "roof_temp": self.sensors.roof_temp,
@@ -18,7 +20,7 @@ class Maintainer(threading.Thread):
     def run(self):
         upload_seconds = 0
         errors = 0
-        while True:
+        while not self.stop_sign:
             try:
                 if errors > 0:
                     errors -= 1
@@ -27,7 +29,7 @@ class Maintainer(threading.Thread):
                 # Go through algorithm to check for valve change
                 self.valve.set_valve(self.sensors)
                 # Send data to the server every 60 seconds while running
-                if upload_seconds >= 60:
+                if upload_seconds >= 60 and self.upload_flag:
                     try:
                         response = requests.post("http://192.168.86.205/pool/status", json={"data":self.standard_response()})
                         response.close()

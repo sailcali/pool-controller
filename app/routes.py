@@ -1,11 +1,21 @@
 from flask import Blueprint, jsonify, request
+from discordwebhook import Discord
+import os
+
 from . import sensors, valve
+from utils.maintainer import Maintainer
+
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/')
+
+MAINTAINER = None
+
+DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
+DISCORD = Discord(url=DISCORD_POOL_URL)
 
 @pool_bp.route('/', methods=['GET'])
 def get_status():
     """Returns the current pool status"""
-    data = {**sensors.data(), **valve.data()}
+    data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
     return jsonify({'data': data}), 200
 
 @pool_bp.route('/valve', methods=['POST'])
@@ -34,12 +44,33 @@ def change_valve():
             valve.position = 0
             valve.delay = delay
 
-    data = {**sensors.data(), **valve.data()}
+    data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
     return jsonify({'data': data}), 201
 
 @pool_bp.route('/temp', methods=['POST'])
 def set_temp():
     body = request.get_json()
     valve.config['max_water_temp'] = int(body['setting'])
-    data = {**sensors.data(), **valve.data()}
+    data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
+    return jsonify({'data': data}), 201
+
+@pool_bp.route('/start-auto', methods=['POST'])
+def start_timer():
+    """This allows the user to request auto valve control"""
+    MAINTAINER = Maintainer(sensors, valve)
+    body = request.get_json()
+    try:
+        MAINTAINER.upload_flag = body['upload']
+    except KeyError:
+        pass
+
+    MAINTAINER.start()
+    DISCORD.post(content="Maintainer running")
+    data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
+    return jsonify({'data': data}), 201
+
+@pool_bp.route('/stop-auto', ['POST'])
+def stop_timer():
+    MAINTAINER.stop_sign = True
+    data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
     return jsonify({'data': data}), 201
