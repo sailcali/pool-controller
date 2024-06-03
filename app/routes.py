@@ -69,7 +69,7 @@ def start_timer():
     data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
     return jsonify({'data': data}), 201
 
-@pool_bp.route('/stop-auto', ['POST'])
+@pool_bp.route('/stop-auto', methods=['POST'])
 def stop_timer():
     MAINTAINER.stop_sign = True
     data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
