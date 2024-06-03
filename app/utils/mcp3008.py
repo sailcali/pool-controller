@@ -1,7 +1,4 @@
-try:
-    from spidev import SpiDev
-except Exception:
-    pass
+from spidev import SpiDev
 
 class MCP3008:
     def __init__(self, bus = 0, device = 0):
