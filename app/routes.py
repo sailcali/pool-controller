@@ -3,7 +3,7 @@ from discordwebhook import Discord
 import os
 
 from . import sensors, valve
-from utils.maintainer import Maintainer
+from .utils.maintainer import Maintainer
 
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/')
 
