@@ -16,7 +16,7 @@ valve = SolarValve()
 
 def create_app():
     app = Flask(__name__)
-    
+    print(DISCORD_POOL_URL)
     DISCORD.post(content="Server running")
     # maintainer = Maintainer(sensors, valve)
     # maintainer.start()
