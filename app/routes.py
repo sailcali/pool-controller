@@ -15,6 +15,8 @@ DISCORD = Discord(url=DISCORD_POOL_URL)
 def standard_response():
     if MAINTAINER != None:
         maint = MAINTAINER.is_alive()
+    else:
+        maint = False
     return {**sensors.data(), **valve.data(), "auto_running":maint}
 
 @pool_bp.route('/', methods=['GET'])
