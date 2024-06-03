@@ -8,7 +8,7 @@ WATER_SENSOR = 7
 class Sensors:
     """Main object which SETS and GETS the status of all onboard sensors"""
     def __init__(self):
-        self.chip = MCP(spi,cs)
+        self.chip = MCP()
 
         self.temps = {0:[],1:[]} # 0 = water temp, 1 = roof temp
         self.water_temp = 0
