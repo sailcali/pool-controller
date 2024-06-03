@@ -12,11 +12,15 @@ MAINTAINER = None
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
+def standard_response():
+    if MAINTAINER != None:
+        maint = MAINTAINER.is_alive()
+    return {**sensors.data(), **valve.data(), "auto_running":maint}
+
 @pool_bp.route('/', methods=['GET'])
 def get_status():
     """Returns the current pool status"""
-    data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
-    return jsonify({'data': data}), 200
+    return jsonify({'data': standard_response()}), 200
 
 @pool_bp.route('/valve', methods=['POST'])
 def change_valve():
@@ -44,8 +48,7 @@ def change_valve():
             valve.position = 0
             valve.delay = delay
 
-    data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
-    return jsonify({'data': data}), 201
+    return jsonify({'data': standard_response()}), 201
 
 @pool_bp.route('/temp', methods=['POST'])
 def set_temp():
@@ -66,11 +69,9 @@ def start_timer():
 
     MAINTAINER.start()
     DISCORD.post(content="Maintainer running")
-    data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
-    return jsonify({'data': data}), 201
+    return jsonify({'data': standard_response()}), 201
 
 @pool_bp.route('/stop-auto', methods=['POST'])
 def stop_timer():
     MAINTAINER.stop_sign = True
-    data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
-    return jsonify({'data': data}), 201
+    return jsonify({'data': standard_response()}), 201
