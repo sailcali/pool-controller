@@ -59,7 +59,7 @@ def set_temp():
     data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
     return jsonify({'data': data}), 201
 
-@pool_bp.route('/start-auto', methods=['POST'])
+@pool_bp.route('/start-auto', methods=['GET'])
 def start_timer():
     """This allows the user to request auto valve control"""
     MAINTAINER = Maintainer(sensors, valve)
@@ -73,7 +73,7 @@ def start_timer():
     DISCORD.post(content="Maintainer running")
     return jsonify({'data': standard_response()}), 201
 
-@pool_bp.route('/stop-auto', methods=['POST'])
+@pool_bp.route('/stop-auto', methods=['GET'])
 def stop_timer():
     MAINTAINER.stop_sign = True
     return jsonify({'data': standard_response()}), 201
