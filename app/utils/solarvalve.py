@@ -9,11 +9,7 @@ VALVE_PIN = 17
 class SolarValve:
     """Controller for the Solar Valve"""
     def __init__(self, config):
-        # self.config = {'min_cycle_time': 90, 
-            # 'max_water_temp': 80, 
-            # 'temp_range_for_open': 20, 
-            # 'temp_range_for_close': 1, 
-            # 'seconds_cal': 1}
+
         self.config = config
         GPIO.setup(VALVE_PIN, GPIO.OUT)
         GPIO.output(VALVE_PIN, False)

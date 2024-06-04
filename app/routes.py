@@ -58,13 +58,13 @@ def set_temp():
 
 @pool_bp.route('/start-auto', methods=['POST'])
 def start_timer():
-    """This allows the user to request auto valve control"""
+    """This allows the user to request auto valve control. User may pass -upload- param as False to not upload to DB every second"""
     
-    # body = request.get_json()
-    # try:
-        # MAINTAINER.upload_flag = body['upload']
-    # except KeyError:
-        # pass
+    body = request.get_json()
+    try:
+        MAINTAINER.upload_flag = body['upload']
+    except KeyError:
+        pass
 
     MAINTAINER.start()
     DISCORD.post(content="Maintainer running")
@@ -72,8 +72,9 @@ def start_timer():
 
 @pool_bp.route('/stop-auto', methods=['POST'])
 def stop_timer():
+    """This will STOP execution of the auto thread and reset the function"""
     global MAINTAINER
-    
+
     MAINTAINER.stop_sign = True
     time.sleep(2)
     MAINTAINER = Maintainer(sensors, valve)
