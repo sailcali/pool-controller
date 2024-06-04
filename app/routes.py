@@ -9,7 +9,7 @@ from .utils.maintainer import Maintainer
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/')
 
 MAINTAINER = Maintainer(sensors, valve)
-
+MAINTAINER.start()
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
@@ -59,7 +59,8 @@ def set_temp():
 @pool_bp.route('/start-auto', methods=['POST'])
 def start_timer():
     """This allows the user to request auto valve control. User may pass -upload- param as False to not upload to DB every second"""
-    
+    global MAINTAINER
+    MAINTAINER = Maintainer(sensors, valve)
     body = request.get_json()
     try:
         MAINTAINER.upload_flag = body['upload']
@@ -67,7 +68,7 @@ def start_timer():
         pass
 
     MAINTAINER.start()
-    DISCORD.post(content="Maintainer running")
+    DISCORD.post(content="Auto running")
     return jsonify({'data': standard_response()}), 201
 
 @pool_bp.route('/stop-auto', methods=['POST'])

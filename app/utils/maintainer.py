@@ -50,3 +50,4 @@ class Maintainer(threading.Thread):
                 logging(f"Pool valve error: {e}\n")
                 if errors > 20:
                     break
+        logging(f"Auto stopped!\n(stop_sign={self.stop_sign})")
