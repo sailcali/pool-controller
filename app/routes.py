@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from discordwebhook import Discord
 import os
+import time
 
 from . import sensors, valve, config
 from .utils.maintainer import Maintainer
@@ -72,4 +73,6 @@ def start_timer():
 @pool_bp.route('/stop-auto', methods=['POST'])
 def stop_timer():
     MAINTAINER.stop_sign = True
+    time.sleep(2)
+    MAINTAINER = Maintainer(sensors, valve)
     return jsonify({'data': standard_response()}), 201
