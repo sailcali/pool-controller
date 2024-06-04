@@ -8,25 +8,22 @@ VALVE_PIN = 17
 
 class SolarValve:
     """Controller for the Solar Valve"""
-    def __init__(self):
-        self.config = {'min_cycle_time': 90, 
-            'max_water_temp': 80, 
-            'temp_range_for_open': 20, 
-            'temp_range_for_close': 1, 
-            'seconds_cal': 1}
+    def __init__(self, config):
+
+        self.config = config
         GPIO.setup(VALVE_PIN, GPIO.OUT)
         GPIO.output(VALVE_PIN, False)
         self.position = 0 # This is the requested position, not necessarily the ACTUAL position
         self.delay = 0 # User requested delay in programming
-        self.last_valve_change = self.config['min_cycle_time'] # init @ min cycle time
+        self.last_valve_change = self.config.min_cycle_time # init @ min cycle time
         self.max_temp_hit_delay = 0 # this will jump to 43200 (12 hrs) if max temp is hit
-        self.temp_range = self.config['temp_range_for_open'] # init at the closed setting (high)
+        self.temp_range = self.config.temp_range_for_open # init at the closed setting (high)
     
     def set_valve(self, sensors):
         """This is run every second to update the valve setting"""
         
         # First guard clause is for if we are within the cycle limit set by config
-        if self.last_valve_change < self.config['min_cycle_time']:
+        if self.last_valve_change < self.config.min_cycle_time:
             return
         
         # Second guard clause will stop any further valve action for 12 hrs once max temp is hit (this also operates the counter)
@@ -35,7 +32,7 @@ class SolarValve:
             return
         
         # Third guard clause checks for if we are at max water temp and if so - ensures valve is closed
-        if sensors.water_temp >= self.config['max_water_temp']:
+        if sensors.water_temp >= self.config.max_water_temp:
             self.close_valve()
             # If we hit the max temp, we are going to bypass any further valve actions for 12 hrs
             self.max_temp_hit_delay = 43200
@@ -67,7 +64,7 @@ class SolarValve:
             self.position = 1
             logging("Solar valve open!")
             self.last_valve_change = 0
-            self.temp_range = self.config["temp_range_for_close"]
+            self.temp_range = self.config.temp_range_for_close
             return True
         else:
             return False
@@ -78,12 +75,12 @@ class SolarValve:
             self.position = 0
             logging("Solar valve closed!")
             self.last_valve_change = 0
-            self.temp_range = self.config["temp_range_for_open"]
+            self.temp_range = self.config.temp_range_for_open
             return True
         else:
             return False
     
     def data(self):
         return {"valve": GPIO.input(VALVE_PIN), 'delay': self.delay,
-                    "last_change": self.last_valve_change, "set_temp": self.config['max_water_temp'],
+                    "last_change": self.last_valve_change,
                     "temp_range": self.temp_range, "max_hit_delay":self.max_temp_hit_delay}

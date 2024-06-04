@@ -1,12 +1,25 @@
 from flask import Blueprint, jsonify, request
-from . import sensors, valve
+from discordwebhook import Discord
+import os
+import time
+
+from . import sensors, valve, config
+from .utils.maintainer import Maintainer
+
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/')
+
+MAINTAINER = Maintainer(sensors, valve)
+
+DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
+DISCORD = Discord(url=DISCORD_POOL_URL)
+
+def standard_response():
+    return {**sensors.data(), **valve.data(), **config.data(), "auto_running":MAINTAINER.is_alive()}
 
 @pool_bp.route('/', methods=['GET'])
 def get_status():
     """Returns the current pool status"""
-    data = {**sensors.data(), **valve.data()}
-    return jsonify({'data': data}), 200
+    return jsonify({'data': standard_response()}), 200
 
 @pool_bp.route('/valve', methods=['POST'])
 def change_valve():
@@ -34,12 +47,35 @@ def change_valve():
             valve.position = 0
             valve.delay = delay
 
-    data = {**sensors.data(), **valve.data()}
-    return jsonify({'data': data}), 201
+    return jsonify({'data': standard_response()}), 201
 
 @pool_bp.route('/temp', methods=['POST'])
 def set_temp():
     body = request.get_json()
     valve.config['max_water_temp'] = int(body['setting'])
-    data = {**sensors.data(), **valve.data()}
+    data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
     return jsonify({'data': data}), 201
+
+@pool_bp.route('/start-auto', methods=['POST'])
+def start_timer():
+    """This allows the user to request auto valve control. User may pass -upload- param as False to not upload to DB every second"""
+    
+    body = request.get_json()
+    try:
+        MAINTAINER.upload_flag = body['upload']
+    except KeyError:
+        pass
+
+    MAINTAINER.start()
+    DISCORD.post(content="Maintainer running")
+    return jsonify({'data': standard_response()}), 201
+
+@pool_bp.route('/stop-auto', methods=['POST'])
+def stop_timer():
+    """This will STOP execution of the auto thread and reset the function"""
+    global MAINTAINER
+
+    MAINTAINER.stop_sign = True
+    time.sleep(2)
+    MAINTAINER = Maintainer(sensors, valve)
+    return jsonify({'data': standard_response()}), 201
