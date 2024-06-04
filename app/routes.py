@@ -72,6 +72,8 @@ def start_timer():
 
 @pool_bp.route('/stop-auto', methods=['POST'])
 def stop_timer():
+    global MAINTAINER
+    
     MAINTAINER.stop_sign = True
     time.sleep(2)
     MAINTAINER = Maintainer(sensors, valve)
