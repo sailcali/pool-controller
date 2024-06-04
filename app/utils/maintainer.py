@@ -14,7 +14,7 @@ class Maintainer(threading.Thread):
     def standard_response(self):
         return {"water_temp": self.sensors.water_temp, "roof_temp": self.sensors.roof_temp,
             "valve": self.valve.current_state(), 'delay': self.valve.delay,
-            "last_change": self.valve.last_valve_change, "set_temp": self.valve.config['max_water_temp'],
+            "last_change": self.valve.last_valve_change, "set_temp": self.valve.config.max_water_temp,
             "temp_range": self.valve.temp_range, "max_hit_delay":self.valve.max_temp_hit_delay}
 
     def run(self):
@@ -38,7 +38,7 @@ class Maintainer(threading.Thread):
                         logging("Pool could not connect to RASPI server!\n")
                 upload_seconds += 1
                 # Wait time between cycles is about 1 second (accounts for run time)
-                time.sleep(self.valve.config['seconds_cal'])
+                time.sleep(self.valve.config.seconds_cal)
                 # Tracking the last valve change value
                 self.valve.last_valve_change += 1
                 # If manually changed, this is the counter to continue the programming

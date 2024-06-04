@@ -3,13 +3,14 @@ import os
 from discordwebhook import Discord
 from .utils.sensors import Sensors
 from .utils.solarvalve import SolarValve
-from .utils.maintainer import Maintainer
+from .utils.config import Config
 
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
+config = Config()
 sensors = Sensors()
-valve = SolarValve()
+valve = SolarValve(config)
 
 def create_app():
     app = Flask(__name__)

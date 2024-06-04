@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from discordwebhook import Discord
 import os
 
-from . import sensors, valve
+from . import sensors, valve, config
 from .utils.maintainer import Maintainer
 
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/')
@@ -13,7 +13,7 @@ DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
 def standard_response():
-    return {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
+    return {**sensors.data(), **valve.data(), **config.data(), "auto_running":MAINTAINER.is_alive()}
 
 @pool_bp.route('/', methods=['GET'])
 def get_status():
