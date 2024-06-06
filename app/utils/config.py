@@ -48,6 +48,7 @@ class Config:
         vars = self.config['var']
         vars[setting] = str(num)
         self._set_config()
+        self._get_config()
     
     def data(self):
         return {"set_temp": self.max_water_temp, "min_cycle_time": self.min_cycle_time, "temp_range_for_open": self.temp_range_for_open,
