@@ -40,7 +40,7 @@ class Config:
             self.config.write(configfile)
 
     def _set_config(self):
-        with open('config.ini', 'w') as configfile:
+        with open('/var/www/pool-controller/config/config.ini', 'w') as configfile:
             self.config.write(configfile)
 
     def change_setting(self, setting, num):
