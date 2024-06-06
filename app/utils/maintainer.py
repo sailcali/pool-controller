@@ -38,9 +38,11 @@ class Maintainer(threading.Thread):
                         upload_errors += 1
                         if upload_errors > 20:
                             self.upload_flag = False
-                upload_seconds += 1
+                
+                if self.upload_flag:
+                    upload_seconds += 1
                 # Wait time between cycles is about 1 second (accounts for run time)
-                time.sleep(self.valve.config.seconds_cal)
+                time.sleep(self.valve.config.seconds_cal/100)
                 # Tracking the last valve change value
                 self.valve.last_valve_change += 1
                 # If manually changed, this is the counter to continue the programming

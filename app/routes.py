@@ -52,7 +52,7 @@ def change_valve():
 @pool_bp.route('/temp', methods=['POST'])
 def set_temp():
     body = request.get_json()
-    valve.config['max_water_temp'] = int(body['setting'])
+    valve.config.change_setting("max_water_temp", int(body['setting']))
     data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
     return jsonify({'data': data}), 201
 
@@ -79,4 +79,14 @@ def stop_timer():
     MAINTAINER.stop_sign = True
     time.sleep(2)
     MAINTAINER = Maintainer(sensors, valve)
+    return jsonify({'data': standard_response()}), 201
+
+@pool_bp.route('/config', methods=['POST'])
+def update_config():
+    """Updates any of the config values. Params must include key and setting values"""
+    body = request.get_json()
+    try:
+        valve.config.change_setting(body['key'], int(body['setting']))
+    except KeyError:
+        return jsonify({'error': 'Must include [key] and [setting] params!'}), 401
     return jsonify({'data': standard_response()}), 201

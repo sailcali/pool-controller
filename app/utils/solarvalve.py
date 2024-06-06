@@ -18,7 +18,9 @@ class SolarValve:
         self.last_valve_change = self.config.min_cycle_time # init @ min cycle time
         self.max_temp_hit_delay = 0 # this will jump to 43200 (12 hrs) if max temp is hit
         self.temp_range = self.config.temp_range_for_open # init at the closed setting (high)
-    
+        self.near_open = False # This will trigger once within a specified temp of opening and send a discord notification
+        self.near_open_temp_diff = 2 # This will be the temp difference when discord notification gets sent
+
     def set_valve(self, sensors):
         """This is run every second to update the valve setting"""
         
@@ -38,6 +40,11 @@ class SolarValve:
             self.max_temp_hit_delay = 43200
             return
         
+        # Fourth we will check to see if we are close to opening and send a discord notification
+        if not self.near_open and sensors.roof_temp > sensors.water_temp + self.temp_range - self.near_open_temp_diff:
+            logging("Work with Pono! Valve is about to open")
+            self.near_temp = True
+
         # User requested manual valve change
         if self.position == 0 and GPIO.input(VALVE_PIN) == 1:
             self._close_valve()
@@ -46,6 +53,7 @@ class SolarValve:
             self._open_valve()
             return
 
+        # If the user selects a delay we will not run the automation. NOTE: This comes AFTER another manual change.
         if self.delay > 0:
             return
 
@@ -56,31 +64,41 @@ class SolarValve:
             self._close_valve()
     
     def current_state(self):
+        """Returns 0 or 1 for valve position"""
         return GPIO.input(VALVE_PIN)
 
     def _open_valve(self):
+        """Opens the valve. This is NOT intented to be used outside this class, but SHOULD reset all triggers"""
         if self.current_state() == 0:
+            # Open the valve
             GPIO.output(VALVE_PIN, True)
-            self.position = 1
+            
+            # Reset the triggers and notify
+            self.position = 1 # Local position tracker gets updated
             logging("Solar valve open!")
-            self.last_valve_change = 0
-            self.temp_range = self.config.temp_range_for_close
+            self.last_valve_change = 0 # reset the last valve change timer
+            self.temp_range = self.config.temp_range_for_close # Change the temp range trigger to CLOSE
+            self.near_temp = False # Reset the near_temp FOR DISCORD NOTIFICATION
             return True
         else:
             return False
             
     def _close_valve(self):
+        """Closes the valve. This is NOT intented to be used outside this class, but SHOULD reset all triggers"""
         if self.current_state() == 1:
+            # Open the valve
             GPIO.output(VALVE_PIN, False)
-            self.position = 0
+            
+            #Reset the triggers and notify
+            self.position = 0 # Local position tracker gets updated
             logging("Solar valve closed!")
-            self.last_valve_change = 0
-            self.temp_range = self.config.temp_range_for_open
+            self.last_valve_change = 0 # Reset the last valve change timer
+            self.temp_range = self.config.temp_range_for_open # Change the temp range trigger to OPEN
             return True
         else:
             return False
     
     def data(self):
-        return {"valve": GPIO.input(VALVE_PIN), 'delay': self.delay,
-                    "last_change": self.last_valve_change,
+        """Gathers all relavent data into a dictionary"""
+        return {"valve": GPIO.input(VALVE_PIN), 'delay': self.delay, "last_change": self.last_valve_change,
                     "temp_range": self.temp_range, "max_hit_delay":self.max_temp_hit_delay}
