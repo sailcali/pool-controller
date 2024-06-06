@@ -14,7 +14,7 @@ class Config:
 
     def _get_config(self):
         """Get the current config file"""
-        self.config.read('/var/www/pool-controller/config.ini')
+        self.config.read('/var/www/pool-controller/config/config.ini')
         try:
             vars = self.config['var']
         except KeyError:
