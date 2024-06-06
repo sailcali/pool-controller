@@ -10,7 +10,8 @@ class Config:
         self.temp_range_for_open= 20
         self.temp_range_for_close = 0
         self.seconds_cal = 1
-
+        self._get_config()
+        
     def _get_config(self):
         """Get the current config file"""
         self.config.read('config.ini')
