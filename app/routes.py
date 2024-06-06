@@ -32,7 +32,7 @@ def change_valve():
     if body['valve'] == True:
         if valve.position == 1:
             return jsonify({'error': 'valve already open'}), 400
-        elif valve.last_valve_change < valve.config['min_cycle_time']:
+        elif valve.last_valve_change < valve.config.min_cycle_time:
             return jsonify({'error': 'last valve change was too recent'}), 400
         else:
             valve.position = 1
@@ -41,7 +41,7 @@ def change_valve():
     elif body['valve'] == False:
         if valve.position == 0:
             return jsonify({'error': 'valve already closed'}), 400
-        elif valve.last_valve_change < valve.config['min_cycle_time']:
+        elif valve.last_valve_change < valve.config.min_cycle_time:
             return jsonify({'error': 'last valve change was too recent'}), 400
         else:
             valve.position = 0
