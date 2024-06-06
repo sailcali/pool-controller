@@ -43,7 +43,7 @@ class SolarValve:
         # Fourth we will check to see if we are close to opening and send a discord notification
         if not self.near_open and sensors.roof_temp > sensors.water_temp + self.temp_range - self.near_open_temp_diff:
             logging("Work with Pono! Valve is about to open")
-            self.near_temp = True
+            self.near_open = True
 
         # User requested manual valve change
         if self.position == 0 and GPIO.input(VALVE_PIN) == 1:
@@ -78,7 +78,7 @@ class SolarValve:
             logging("Solar valve open!")
             self.last_valve_change = 0 # reset the last valve change timer
             self.temp_range = self.config.temp_range_for_close # Change the temp range trigger to CLOSE
-            self.near_temp = False # Reset the near_temp FOR DISCORD NOTIFICATION
+            self.near_open = False # Reset the near_open FOR DISCORD NOTIFICATION
             return True
         else:
             return False
