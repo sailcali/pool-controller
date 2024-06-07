@@ -19,7 +19,7 @@ class SolarValve:
         self.max_temp_hit_delay = 0 # this will jump to 43200 (12 hrs) if max temp is hit
         self.temp_range = self.config.temp_range_for_open # init at the closed setting (high)
         self.near_open = False # This will trigger once within a specified temp of opening and send a discord notification
-        self.near_open_temp_diff = 2 # This will be the temp difference when discord notification gets sent
+        self.near_open_temp_diff = 1 # This will be the temp difference when discord notification gets sent
 
     def set_valve(self, sensors):
         """This is run every second to update the valve setting"""
@@ -42,7 +42,7 @@ class SolarValve:
             return
         
         # Fourth we will check to see if we are close to opening and send a discord notification
-        if not self.near_open and sensors.roof_temp > sensors.water_temp + self.temp_range - self.near_open_temp_diff:
+        if not self.near_open and GPIO.input(VALVE_PIN) == 0 and sensors.roof_temp > sensors.water_temp + self.config.temp_range_for_open - self.near_open_temp_diff:
             logging("Work with Pono! Valve is about to open")
             self.near_open = True
 
