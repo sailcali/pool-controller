@@ -14,7 +14,7 @@ WATER_CH = 7
 
 CONFIG = Config()
 SENSORS = {"roof": Sensor(ROOF_CH), "water": Sensor(WATER_CH)}
-SOLAR_VALVE = Valve(CONFIG, SENSORS)
+SOLAR_VALVE = Valve(CONFIG)
 
 def create_app():
     app = Flask(__name__)
