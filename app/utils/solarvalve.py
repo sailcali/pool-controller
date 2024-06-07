@@ -35,7 +35,8 @@ class SolarValve:
         
         # Third guard clause checks for if we are at max water temp and if so - ensures valve is closed
         if sensors.water_temp >= self.config.max_water_temp:
-            self.close_valve()
+            self._close_valve()
+            logging(f"Max temp ({self.config.max_water_temp} deg) reached!")
             # If we hit the max temp, we are going to bypass any further valve actions for 12 hrs
             self.max_temp_hit_delay = 43200
             return
