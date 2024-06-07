@@ -24,7 +24,7 @@ class Maintainer(threading.Thread):
         while not self.stop_sign:
             try:
                 # Refresh the current temperatures
-                for sensor in self.sensors:
+                for sensor in self.sensors.values():
                     sensor.refresh_temp()
                 # Go through algorithm to check for valve change
                 self.valve.set_valve(self.sensors)
