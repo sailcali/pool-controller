@@ -6,7 +6,7 @@ GPIO.setwarnings(False)
 
 VALVE_PIN = 17
 
-class SolarValve:
+class Valve:
     """Controller for the Solar Valve"""
     def __init__(self, config):
 
@@ -34,7 +34,7 @@ class SolarValve:
             return
         
         # Third guard clause checks for if we are at max water temp and if so - ensures valve is closed
-        if sensors.water_temp >= self.config.max_water_temp:
+        if sensors['water'].temp() >= self.config.max_water_temp:
             self._close_valve()
             logging(f"Max temp ({self.config.max_water_temp} deg) reached!")
             # If we hit the max temp, we are going to bypass any further valve actions for 12 hrs
@@ -42,7 +42,7 @@ class SolarValve:
             return
         
         # Fourth we will check to see if we are close to opening and send a discord notification
-        if not self.near_open and GPIO.input(VALVE_PIN) == 0 and sensors.roof_temp > sensors.water_temp + self.config.temp_range_for_open - self.near_open_temp_diff:
+        if not self.near_open and GPIO.input(VALVE_PIN) == 0 and sensors['roof'].temp() > sensors['water'].temp() + self.config.temp_range_for_open - self.near_open_temp_diff:
             logging("Work with Pono! Valve is about to open")
             self.near_open = True
 
@@ -59,7 +59,7 @@ class SolarValve:
             return
 
         # If the roof temp is above the current registered warm value, make sure it get opened, otherwise closed
-        if sensors.roof_temp > sensors.water_temp + self.temp_range:
+        if sensors['roof'].temp() > sensors['water'].temp() + self.temp_range:
             self._open_valve()
         else:
             self._close_valve()

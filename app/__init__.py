@@ -1,16 +1,20 @@
 from flask import Flask
 import os
 from discordwebhook import Discord
-from .utils.sensors import Sensors
-from .utils.solarvalve import SolarValve
+from .utils.sensors import Sensor
+from .utils.solarvalve import Valve
 from .utils.config import Config
 
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
-config = Config()
-sensors = Sensors()
-valve = SolarValve(config)
+# Roof is ADC ch 0 and water is ADC ch 7
+ROOF_CH = 0
+WATER_CH = 7
+
+CONFIG = Config()
+SENSORS = {"roof": Sensor(ROOF_CH), "water": Sensor(WATER_CH)}
+SOLAR_VALVE = Valve(CONFIG, SENSORS)
 
 def create_app():
     app = Flask(__name__)
