@@ -10,10 +10,11 @@ class Config:
         self.temp_range_for_open= 20
         self.temp_range_for_close = 0
         self.seconds_cal = 1
+        self._get_config()
 
     def _get_config(self):
         """Get the current config file"""
-        self.config.read('config.ini')
+        self.config.read('/var/www/pool-controller/config/config.ini')
         try:
             vars = self.config['var']
         except KeyError:
@@ -39,7 +40,7 @@ class Config:
             self.config.write(configfile)
 
     def _set_config(self):
-        with open('config.ini', 'w') as configfile:
+        with open('/var/www/pool-controller/config/config.ini', 'w') as configfile:
             self.config.write(configfile)
 
     def change_setting(self, setting, num):
@@ -47,6 +48,7 @@ class Config:
         vars = self.config['var']
         vars[setting] = str(num)
         self._set_config()
+        self._get_config()
     
     def data(self):
         return {"set_temp": self.max_water_temp, "min_cycle_time": self.min_cycle_time, "temp_range_for_open": self.temp_range_for_open,

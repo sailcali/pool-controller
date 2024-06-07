@@ -9,7 +9,7 @@ from .utils.maintainer import Maintainer
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/')
 
 MAINTAINER = Maintainer(sensors, valve)
-
+MAINTAINER.start()
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
@@ -32,7 +32,7 @@ def change_valve():
     if body['valve'] == True:
         if valve.position == 1:
             return jsonify({'error': 'valve already open'}), 400
-        elif valve.last_valve_change < valve.config['min_cycle_time']:
+        elif valve.last_valve_change < valve.config.min_cycle_time:
             return jsonify({'error': 'last valve change was too recent'}), 400
         else:
             valve.position = 1
@@ -41,7 +41,7 @@ def change_valve():
     elif body['valve'] == False:
         if valve.position == 0:
             return jsonify({'error': 'valve already closed'}), 400
-        elif valve.last_valve_change < valve.config['min_cycle_time']:
+        elif valve.last_valve_change < valve.config.min_cycle_time:
             return jsonify({'error': 'last valve change was too recent'}), 400
         else:
             valve.position = 0
@@ -52,14 +52,15 @@ def change_valve():
 @pool_bp.route('/temp', methods=['POST'])
 def set_temp():
     body = request.get_json()
-    valve.config['max_water_temp'] = int(body['setting'])
+    valve.config.change_setting("max_water_temp", int(body['setting']))
     data = {**sensors.data(), **valve.data(), "auto_running":MAINTAINER.is_alive()}
     return jsonify({'data': data}), 201
 
 @pool_bp.route('/start-auto', methods=['POST'])
 def start_timer():
     """This allows the user to request auto valve control. User may pass -upload- param as False to not upload to DB every second"""
-    
+    global MAINTAINER
+    MAINTAINER = Maintainer(sensors, valve)
     body = request.get_json()
     try:
         MAINTAINER.upload_flag = body['upload']
@@ -67,7 +68,7 @@ def start_timer():
         pass
 
     MAINTAINER.start()
-    DISCORD.post(content="Maintainer running")
+    DISCORD.post(content="Auto running")
     return jsonify({'data': standard_response()}), 201
 
 @pool_bp.route('/stop-auto', methods=['POST'])
@@ -78,4 +79,14 @@ def stop_timer():
     MAINTAINER.stop_sign = True
     time.sleep(2)
     MAINTAINER = Maintainer(sensors, valve)
+    return jsonify({'data': standard_response()}), 201
+
+@pool_bp.route('/config', methods=['POST'])
+def update_config():
+    """Updates any of the config values. Params must include key and setting values"""
+    body = request.get_json()
+    try:
+        valve.config.change_setting(body['key'], int(body['setting']))
+    except KeyError:
+        return jsonify({'error': 'Must include [key] and [setting] params!'}), 401
     return jsonify({'data': standard_response()}), 201
