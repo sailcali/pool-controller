@@ -57,7 +57,7 @@ def change_valve():
 @pool_bp.route('/temp', methods=['POST'])
 def set_temp():
     body = request.get_json()
-    SOLAR_VALVE.config.change_setting("max_water_temp", int(body['setting']))
+    CONFIG.change_setting("max_water_temp", int(body['setting']))
     return jsonify({'data': standard_response()}), 201
 
 # @pool_bp.route('/start-auto', methods=['POST'])
