@@ -13,6 +13,7 @@ upload_flag = True
 DEBUG = os.environ.get("FLASK_DEBUG")
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
+DEBUG = False
 
 def logging(string=None):
         DISCORD.post(content=string)
@@ -21,7 +22,11 @@ while True:
     try:
 
         # Call the API
-        response = requests.put("http://127.0.0.1:5000/refresh-valve")
+        response = requests.put("http://127.0.0.1/refresh-valve")
+        if response.status_code != 201:
+            logging("Pool controller offline!")
+            break
+        
         # Response is standard response
         data = response.json()
 
@@ -31,7 +36,7 @@ while True:
                 if DEBUG:
                     print(data)
                 else:
-                    response = requests.post("http://192.168.86.205/pool/status", json={"data":data})
+                    response = requests.post("http://192.168.86.205/pool/status", json={"data":data['data']})
                 upload_seconds = -1
             except OSError:
                 logging("Pool could not connect to RASPI server!\n")
