@@ -90,7 +90,7 @@ def update_config():
     """Updates any of the config values. Params must include key and setting values"""
     body = request.get_json()
     try:
-        SOLAR_VALVE.config.change_setting(body['key'], int(body['setting']))
+        CONFIG.change_setting(body['key'], int(body['setting']))
     except KeyError:
         return jsonify({'error': 'Must include [key] and [setting] params!'}), 401
     return jsonify({'data': standard_response()}), 201
