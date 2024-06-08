@@ -8,8 +8,6 @@ from .utils.logging import logging
 
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/')
 
-# MAINTAINER = Maintainer(SENSORS, SOLAR_VALVE)
-# MAINTAINER.start()
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
@@ -59,31 +57,6 @@ def set_temp():
     body = request.get_json()
     CONFIG.change_setting("max_water_temp", int(body['setting']))
     return jsonify({'data': standard_response()}), 201
-
-# @pool_bp.route('/start-auto', methods=['POST'])
-# def start_timer():
-#     """This allows the user to request auto valve control. User may pass -upload- param as False to not upload to DB every second"""
-#     global MAINTAINER
-#     MAINTAINER = Maintainer(SENSORS, SOLAR_VALVE)
-#     body = request.get_json()
-#     try:
-#         MAINTAINER.upload_flag = body['upload']
-#     except KeyError:
-#         pass
-
-#     MAINTAINER.start()
-#     DISCORD.post(content="Auto running")
-#     return jsonify({'data': standard_response()}), 201
-
-# @pool_bp.route('/stop-auto', methods=['POST'])
-# def stop_timer():
-#     """This will STOP execution of the auto thread and reset the function"""
-#     global MAINTAINER
-
-#     MAINTAINER.stop_sign = True
-#     time.sleep(2)
-#     MAINTAINER = Maintainer(SENSORS, SOLAR_VALVE)
-#     return jsonify({'data': standard_response()}), 201
 
 @pool_bp.route('/config', methods=['POST'])
 def update_config():

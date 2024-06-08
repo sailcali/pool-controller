@@ -1,6 +1,5 @@
 import configparser
-from datetime import datetime, timedelta, date
-import pytz
+from datetime import datetime, date
 import os
 
 DEBUG = os.environ.get("FLASK_DEBUG")
