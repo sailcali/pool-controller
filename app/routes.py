@@ -14,7 +14,12 @@ DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
 def standard_response():
-    return {"roof_temp": SENSORS['roof'].temp(), "water_temp": SENSORS['water'].temp(), **SOLAR_VALVE.data(), **CONFIG.data()}
+    if SOLAR_VALVE.current_state() == 0:
+        temp_range = CONFIG.temp_range_for_open
+    else:
+        temp_range = CONFIG.temp_range_for_close
+    return {"temp_range": temp_range, "roof_temp": SENSORS['roof'].temp(), 
+            "water_temp": SENSORS['water'].temp(), **SOLAR_VALVE.data(), **CONFIG.data()}
 
 @pool_bp.route('/', methods=['GET'])
 def get_status():

@@ -4,7 +4,7 @@ import pytz
 import os
 
 DEBUG = os.environ.get("FLASK_DEBUG")
-
+DEBUG = False
 if DEBUG:
     FILENAME = "config/config.ini"
 else:
