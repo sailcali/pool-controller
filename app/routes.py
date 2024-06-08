@@ -18,7 +18,7 @@ def standard_response():
         temp_range = CONFIG.temp_range_for_open
     else:
         temp_range = CONFIG.temp_range_for_close
-    return {"max_temp_hits": 0, "temp_range": temp_range, "roof_temp": SENSORS['roof'].temp(), 
+    return {"max_hit_delay": 0, "temp_range": temp_range, "roof_temp": SENSORS['roof'].temp(), 
             "water_temp": SENSORS['water'].temp(), **SOLAR_VALVE.data(), **CONFIG.data()}
 
 @pool_bp.route('/', methods=['GET'])
