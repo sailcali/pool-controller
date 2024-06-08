@@ -1,3 +1,5 @@
+#!/var/www/pool-controller/venv/bin/python3
+
 import requests
 import time
 from discordwebhook import Discord
@@ -30,7 +32,7 @@ while True:
         # Response is standard response
         data = response.json()
 
-        if upload_seconds >= 5 and upload_flag:
+        if upload_seconds >= 60 and upload_flag:
             # Upload the data to server
             try:
                 if DEBUG:
