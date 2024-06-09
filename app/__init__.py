@@ -7,8 +7,6 @@ DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DEBUG = os.environ.get("FLASK_DEBUG")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
-DEBUG = False
-
 # Roof is ADC ch 0 and water is ADC ch 7
 ROOF_CH = 0
 WATER_CH = 7

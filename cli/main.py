@@ -4,6 +4,9 @@ import requests
 import time
 from discordwebhook import Discord
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 upload_seconds = 0
 upload_errors = 0
@@ -15,7 +18,6 @@ upload_flag = True
 DEBUG = os.environ.get("FLASK_DEBUG")
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
-DEBUG = False
 
 def logging(string=None):
         DISCORD.post(content=string)
