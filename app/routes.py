@@ -16,7 +16,11 @@ def standard_response():
         temp_range = CONFIG.temp_range_for_open
     else:
         temp_range = CONFIG.temp_range_for_close
-    return {"max_hit_delay": 0, "temp_range": temp_range, "roof_temp": SENSORS['roof'].temp(), 
+    if CONFIG.max_temp_today():
+        max_hit_delay = 1
+    else:
+        max_hit_delay = 0
+    return {"max_hit_delay": max_hit_delay, "temp_range": temp_range, "roof_temp": SENSORS['roof'].temp(), 
             "water_temp": SENSORS['water'].temp(), **SOLAR_VALVE.data(), **CONFIG.data()}
 
 @pool_bp.route('/', methods=['GET'])
@@ -93,7 +97,7 @@ def routine_solar_valve_control():
         return jsonify({'data': standard_response()}), 201
     
     # Second guard clause will stop any further valve action this day once max temp is hit (this also operates the counter)
-    if CONFIG.max_temp_hit_date == datetime.today().date():
+    if CONFIG.max_temp_today():
         return jsonify({'data': standard_response()}), 201
     
     # Third guard clause checks for if we are at max water temp and if so - ensures valve is closed

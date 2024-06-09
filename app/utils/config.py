@@ -59,14 +59,21 @@ class Config:
 
     def change_setting(self, setting=None, num=None, max_temp_hit=None):
         """Change one of the variables in the config file. Requires setting string and new setting number"""
+        vars = self.config['var']
         if max_temp_hit is not None:
             vars['max_temp_hit_date'] = datetime.strftime(date.today(),"%Y-%m-%d")
         else:
-            vars = self.config['var']
             vars[setting] = str(num)
         self._set_config()
         self._get_config()
     
+    def max_temp_today(self):
+        """Returns True if max temp was hit today"""
+        if self.max_temp_hit_date == date.today():
+            return True
+        else:
+            return False
+
     def data(self):
         return {"set_temp": self.max_water_temp, "min_cycle_time": self.min_cycle_time, "temp_range_for_open": self.temp_range_for_open,
                 "temp_range_for_close": self.temp_range_for_close, "seconds_cal": self.seconds_cal, "max_temp_hit_date": self.max_temp_hit_date}
