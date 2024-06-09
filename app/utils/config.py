@@ -3,8 +3,8 @@ from datetime import datetime, date
 import os
 
 DEBUG = os.environ.get("FLASK_DEBUG")
-DEBUG = False
-if DEBUG:
+
+if DEBUG == "True":
     FILENAME = "config/config.ini"
 else:
     FILENAME = "/var/www/pool-controller/config/config.ini"

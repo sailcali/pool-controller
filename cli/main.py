@@ -16,6 +16,11 @@ upload_flag = True
 # TODO Remove seconds cal from config?
 
 DEBUG = os.environ.get("FLASK_DEBUG")
+if DEBUG == "True":
+    DEBUG = True
+else:
+    DEBUG = False
+
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
