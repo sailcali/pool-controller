@@ -5,13 +5,17 @@ import time
 from discordwebhook import Discord
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
-upload_seconds = 0
-upload_errors = 0
-errors = 0
-upload_flag = True
+UPLOAD_SECONDS = 0
+UPLOAD_ERRORS = 0
+CONTROLLER_ERRORS = 0
+ERRORS = 0
+UPLOAD_FLAG = True
+PUMP_START = 10
+PUMP_STOP = 16
 
 # TODO Remove seconds cal from config?
 
@@ -28,8 +32,20 @@ def logging(string=None):
         DISCORD.post(content=string)
 
 while True:
-    try:
+    
+    if not datetime.now().hour >= PUMP_START and datetime.now().hour < PUMP_STOP:
+        response = requests.put("http://127.0.0.1/refresh-valve")
+        if response.status_code != 201:
+            logging("Pool controller offline!")
+            CONTROLLER_ERRORS += 1
+        else:
+            if CONTROLLER_ERRORS > 0:
+                CONTROLLER_ERRORS -= 1
+        if CONTROLLER_ERRORS > 10:
+            break
+        time.sleep(1)
 
+    try:
         # Call the API
         response = requests.put("http://127.0.0.1/refresh-valve")
         if response.status_code != 201:
@@ -39,33 +55,34 @@ while True:
         # Response is standard response
         data = response.json()
 
-        if upload_seconds >= 60 and upload_flag:
+        if UPLOAD_SECONDS >= 60 and UPLOAD_FLAG:
             # Upload the data to server
             try:
                 if DEBUG:
                     print(data)
                 else:
                     response = requests.post("http://192.168.86.205/pool/status", json={"data":data['data']})
-                upload_seconds = -1
+                UPLOAD_SECONDS = -1
             except OSError:
                 logging("Pool could not connect to RASPI server!\n")
-                upload_errors += 1
-                if upload_errors > 20:
-                    upload_flag = False
+                UPLOAD_ERRORS += 1
+                if UPLOAD_ERRORS > 20:
+                    UPLOAD_FLAG = False
             else:
-                if upload_errors > 0:
-                    upload_errors -= 1
+                if UPLOAD_ERRORS > 0:
+                    UPLOAD_ERRORS -= 1
 
-        upload_seconds += 1
+        UPLOAD_SECONDS += 1
 
     except Exception as error:
-        errors += 1
+        ERRORS += 1
         logging(f"Problem with the auto program: {error}")
-        if errors > 20:
-            logging(f'Too many errors, auto closing.')
+        if ERRORS > 20:
             break
     else:
-        if errors > 0:
-            errors -= 1
+        if ERRORS > 0:
+            ERRORS -= 1
     finally:
         time.sleep(1)
+
+logging(f'Too many errors, auto closing.')

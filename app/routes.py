@@ -105,9 +105,9 @@ def routine_solar_valve_control():
         return jsonify({'data': standard_response()}), 201
     
     # # Fourth we will check to see if we are close to opening and send a discord notification
-    # if not self.near_open and GPIO.input(VALVE_PIN) == 0 and sensors['roof'].temp() > sensors['water'].temp() + self.config.temp_range_for_open - self.near_open_temp_diff:
-    #     logging("Work with Pono! Valve is about to open")
-    #     self.near_open = True
+    if not SOLAR_VALVE.near_open and SOLAR_VALVE.current_state() == 0 and SENSORS['roof'].temp() > SENSORS['water'].temp() + CONFIG.temp_range_for_open - CONFIG.near_open_temp_diff:
+        logging("Work with Pono! Valve is about to open")
+        SOLAR_VALVE.near_open = True
 
     # If the user selects a delay we will not run the automation. NOTE: This comes AFTER another manual change.
     if SOLAR_VALVE.delay > 0:

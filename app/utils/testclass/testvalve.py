@@ -8,6 +8,8 @@ class TestValve:
         self.delay = 0 # User requested delay in programming
         self.last_valve_change = min_cycle_time # init @ min cycle time
         self.position = 0
+        self.near_open = False
+
     def current_state(self):
         """Returns 0 or 1 for valve position"""
         return self.position
@@ -19,11 +21,9 @@ class TestValve:
             self.position = 1
             
             # Reset the triggers and notify
-            # self.position = 1 # Local position tracker gets updated
-            logging("Solar valve open!")
             self.last_valve_change = 0 # reset the last valve change timer
-            # self.temp_range = self.config.temp_range_for_close # Change the temp range trigger to CLOSE
-            # self.near_open = False # Reset the near_open FOR DISCORD NOTIFICATION
+            self.near_open = False # Reset the near_open FOR DISCORD NOTIFICATION
+            logging("Solar valve open!")
             return True
         else:
             return False
@@ -35,10 +35,8 @@ class TestValve:
             self.position = 0
             
             #Reset the triggers and notify
-            # self.position = 0 # Local position tracker gets updated
-            logging("Solar valve closed!")
             self.last_valve_change = 0 # Reset the last valve change timer
-            # self.temp_range = self.config.temp_range_for_open # Change the temp range trigger to OPEN
+            logging("Solar valve closed!")
             return True
         else:
             return False

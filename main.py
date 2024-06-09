@@ -1,4 +1,4 @@
-# from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date
 # import configparser
 # import pytz
 
@@ -24,3 +24,4 @@
 # last_max = datetime.strptime(vars['max_temp_hit_date'],'%Y-%m-%d').date()
 # print(datetime.strftime(last_max, "%Y-%m-%d"))
 
+print(type(datetime.now().hour))

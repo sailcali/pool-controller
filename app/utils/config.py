@@ -19,9 +19,14 @@ class Config:
         self.max_water_temp = 82 # Default to 82
         self.temp_range_for_open= 20 # Default to 20
         self.temp_range_for_close = 0 # Default to 0
-        self.seconds_cal = 1 # default to 1
         self.max_temp_hit_date = date.today().replace(day=date.today().day - 1) # Default to yesterday
-        # self.max_temp_hit_date = datetime.now(tz=pytz.timezone('US/Pacific')).date() - timedelta(days=1) # default to yesterday
+        
+        # LOCAL CONFIG ONLY, NOT REMOTELY EDITABLE
+        self.near_open_temp_diff = 1
+
+        # DEPRECATED
+        self.seconds_cal = 1 # default to 1
+
         self._get_config()
 
     def _get_config(self):
