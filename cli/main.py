@@ -33,7 +33,7 @@ def logging(string=None):
 
 while True:
     
-    if not datetime.now().hour >= PUMP_START and datetime.now().hour < PUMP_STOP:
+    if not datetime.now().hour >= PUMP_START and not datetime.now().hour < PUMP_STOP:
         response = requests.put("http://127.0.0.1/refresh-valve")
         if response.status_code != 201:
             logging("Pool controller offline!")
