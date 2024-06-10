@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from discordwebhook import Discord
 import os
-from datetime import datetime
+from datetime import datetime, time
 
 from . import SENSORS, SOLAR_VALVE, CONFIG
 from .utils.logging import logging
@@ -10,6 +10,8 @@ pool_bp = Blueprint('pool_bp', __name__, url_prefix='/')
 
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
+PUMP_START = time(10, 0, 0)
+PUMP_STOP = time(16, 0, 0)
 
 def standard_response():
     if SOLAR_VALVE.current_state() == 0:
@@ -20,7 +22,8 @@ def standard_response():
         max_hit_delay = 1
     else:
         max_hit_delay = 0
-    return {"max_hit_delay": max_hit_delay, "temp_range": temp_range, "roof_temp": SENSORS['roof'].temp(), 
+    pump_on = datetime.now().time() >= PUMP_START and datetime.now().time() < PUMP_STOP
+    return {"pump_on": pump_on, "max_hit_delay": max_hit_delay, "temp_range": temp_range, "roof_temp": SENSORS['roof'].temp(), 
             "water_temp": SENSORS['water'].temp(), **SOLAR_VALVE.data(), **CONFIG.data()}
 
 @pool_bp.route('/', methods=['GET'])

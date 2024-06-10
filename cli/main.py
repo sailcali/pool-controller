@@ -14,8 +14,6 @@ UPLOAD_ERRORS = 0
 CONTROLLER_ERRORS = 0
 ERRORS = 0
 UPLOAD_FLAG = True
-PUMP_START = time(10, 0, 0)
-PUMP_STOP = time(16, 0, 0)
 
 # TODO Remove seconds cal from config?
 
@@ -32,8 +30,8 @@ def logging(string=None):
         DISCORD.post(content=string)
 
 while True:
-    pump_on = datetime.now().time() >= PUMP_START and datetime.now().time() < PUMP_STOP
-    if not pump_on:
+    try:
+        # Call API to update valve and get current values
         response = requests.put("http://127.0.0.1/refresh-valve")
         if response.status_code != 201:
             logging("Pool controller offline!")
@@ -43,19 +41,15 @@ while True:
                 CONTROLLER_ERRORS -= 1
         if CONTROLLER_ERRORS > 10:
             break
-        timer.sleep(1)
-        continue
-
-    try:
-        # Call the API
-        response = requests.put("http://127.0.0.1/refresh-valve")
-        if response.status_code != 201:
-            logging("Pool controller offline!")
-            break
         
         # Response is standard response
         data = response.json()
 
+        # Guard clause to NOT upload if pump is not running
+        if not data['pump_on']:
+            timer.sleep(1)
+            continue
+    
         if UPLOAD_SECONDS >= 60 and UPLOAD_FLAG:
             # Upload the data to server
             try:
