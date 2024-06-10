@@ -5,7 +5,7 @@ import time
 from discordwebhook import Discord
 import os
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, time
 
 load_dotenv()
 
@@ -14,8 +14,8 @@ UPLOAD_ERRORS = 0
 CONTROLLER_ERRORS = 0
 ERRORS = 0
 UPLOAD_FLAG = True
-PUMP_START = 10
-PUMP_STOP = 16
+PUMP_START = time(10, 0, 0)
+PUMP_STOP = time(16, 0, 0)
 
 # TODO Remove seconds cal from config?
 
@@ -32,8 +32,8 @@ def logging(string=None):
         DISCORD.post(content=string)
 
 while True:
-    
-    if not datetime.now().hour >= PUMP_START and not datetime.now().hour < PUMP_STOP:
+    pump_on = datetime.now().time() >= PUMP_START and datetime.now().time() < PUMP_STOP
+    if not pump_on:
         response = requests.put("http://127.0.0.1/refresh-valve")
         if response.status_code != 201:
             logging("Pool controller offline!")
