@@ -43,7 +43,7 @@ while True:
             break
         
         # Response is standard response
-        data = response.json()
+        data = response.json()['data']
 
         # Guard clause to NOT upload if pump is not running
         if not data['pump_on']:
@@ -56,7 +56,7 @@ while True:
                 if DEBUG:
                     print(data)
                 else:
-                    response = requests.post("http://192.168.86.205/pool/status", json={"data":data['data']})
+                    response = requests.post("http://192.168.86.205/pool/status", json={"data":data})
                 UPLOAD_SECONDS = -1
             except OSError:
                 logging("Pool could not connect to RASPI server!\n")
