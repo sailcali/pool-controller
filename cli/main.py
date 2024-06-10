@@ -44,6 +44,7 @@ while True:
         if CONTROLLER_ERRORS > 10:
             break
         time.sleep(1)
+        continue
 
     try:
         # Call the API
