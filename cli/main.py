@@ -1,7 +1,7 @@
 #!/var/www/pool-controller/venv/bin/python3
 
 import requests
-import time
+import time as timer
 from discordwebhook import Discord
 import os
 from dotenv import load_dotenv
@@ -43,7 +43,7 @@ while True:
                 CONTROLLER_ERRORS -= 1
         if CONTROLLER_ERRORS > 10:
             break
-        time.sleep(1)
+        timer.sleep(1)
         continue
 
     try:
@@ -84,6 +84,6 @@ while True:
         if ERRORS > 0:
             ERRORS -= 1
     finally:
-        time.sleep(1)
+        timer.sleep(1)
 
 logging(f'Too many errors, auto closing.')
