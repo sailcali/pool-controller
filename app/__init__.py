@@ -23,12 +23,12 @@ if DEBUG:
     from .utils.testclass.testvalve import TestValve
     from .utils.testclass.testsensor import TestSensor
     SENSORS = {"roof": TestSensor(ROOF_CH), "water": TestSensor(WATER_CH)}
-    SOLAR_VALVE = TestValve(CONFIG.min_cycle_time)
+    SOLAR_VALVE = TestValve()
 else:
     from .utils.sensor import Sensor
     from .utils.valve import Valve
     SENSORS = {"roof": Sensor(ROOF_CH), "water": Sensor(WATER_CH)}
-    SOLAR_VALVE = Valve(CONFIG.min_cycle_time)
+    SOLAR_VALVE = Valve()
 
 def create_app():
     app = Flask(__name__)
