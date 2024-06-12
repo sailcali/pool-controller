@@ -155,24 +155,21 @@ if __name__ == "__main__":
                 if ERRORS > 0:
                     ERRORS -= 1
 
-        # Guard clause to NOT upload if pump is not running
-        if not standard_data()['pump_on']:
-            timer.sleep(1)
-            continue
-
-        if UPLOAD_SECONDS >= 5:
-            # Upload
-            uploaded = upload_data()
-            UPLOAD_SECONDS = -1
-            
-            # Error handling for upload
-            if uploaded:
-                if UPLOAD_ERRORS > 0:
-                    UPLOAD_ERRORS -= 1
-            else:
-                UPLOAD_ERRORS += 1
-                if UPLOAD_ERRORS > 20:
-                    UPLOAD_FLAG = False
+        # Only upload if pump is running, and every 60 seconds
+        if standard_data()['pump_on']:
+            if UPLOAD_SECONDS >= 60:
+                # Upload
+                uploaded = upload_data()
+                UPLOAD_SECONDS = -1
+                
+                # Error handling for upload
+                if uploaded:
+                    if UPLOAD_ERRORS > 0:
+                        UPLOAD_ERRORS -= 1
+                else:
+                    UPLOAD_ERRORS += 1
+                    if UPLOAD_ERRORS > 20:
+                        UPLOAD_FLAG = False
         
         timer.sleep(1) # One second between checks
         
