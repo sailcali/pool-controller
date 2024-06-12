@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-from app.utils.config import Config as CONFIG
+from app import CONFIG
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
