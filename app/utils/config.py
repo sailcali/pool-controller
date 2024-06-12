@@ -90,6 +90,7 @@ class Config:
     
     def request_user_change(self,valve=False,delay=0):
         """Request user implemented valve change"""
+        self.get_config()
         request = self.config['request']
         request['settled'] = "False"
         request['valve'] = str(valve)
