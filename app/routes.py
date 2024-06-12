@@ -47,11 +47,8 @@ def change_valve():
     elif body['valve'] == False:
         if SOLAR_VALVE.current_state() == 0:
             return jsonify({'error': 'valve already closed'}), 400
-        elif SOLAR_VALVE.last_valve_change < CONFIG.min_cycle_time:
-            return jsonify({'error': 'last valve change was too recent'}), 400
         else:
-            SOLAR_VALVE.close_valve()
-            SOLAR_VALVE.delay = delay
+            SOLAR_VALVE.close_valve(delay)
 
     return jsonify({'data': standard_response()}), 201
 
