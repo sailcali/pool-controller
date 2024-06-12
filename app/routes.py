@@ -30,33 +30,28 @@ def get_status():
     """Returns the current pool status"""
     return jsonify({'data': standard_response()}), 200
 
-# TODO Come up with method for changing valve status
-# IDEA: Add config "request" section where we request to other program to change
-# @pool_bp.route('/valve', methods=['POST'])
-# def change_valve():
-#     """Manually opens or closes the solar valve"""
-#     body = request.get_json()
-#     try:
-#         delay = int(body['delay'])
-#     except KeyError:
-#         delay = 90
-#     if body['valve'] == True:
-#         if SOLAR_VALVE.current_state() == 1:
-#             return jsonify({'error': 'valve already open'}), 400
-#         elif SOLAR_VALVE.last_valve_change < CONFIG.min_cycle_time:
-#             return jsonify({'error': 'last valve change was too recent'}), 400
-#         else:
-#             SOLAR_VALVE.open_valve()
-#             SOLAR_VALVE.delay = delay
+@pool_bp.route('/valve', methods=['POST'])
+def change_valve():
+    """Manually opens or closes the solar valve"""
+    body = request.get_json()
+    try:
+        delay = int(body['delay'])
+    except KeyError:
+        delay = 90
+    if body['valve'] == True:
+        if SOLAR_VALVE.current_state() == 1:
+            return jsonify({'error': 'valve already open'}), 400
+        else:
+            SOLAR_VALVE.open_valve(delay)
 
-#     elif body['valve'] == False:
-#         if SOLAR_VALVE.current_state() == 0:
-#             return jsonify({'error': 'valve already closed'}), 400
-#         elif SOLAR_VALVE.last_valve_change < CONFIG.min_cycle_time:
-#             return jsonify({'error': 'last valve change was too recent'}), 400
-#         else:
-#             SOLAR_VALVE.close_valve()
-#             SOLAR_VALVE.delay = delay
+    elif body['valve'] == False:
+        if SOLAR_VALVE.current_state() == 0:
+            return jsonify({'error': 'valve already closed'}), 400
+        elif SOLAR_VALVE.last_valve_change < CONFIG.min_cycle_time:
+            return jsonify({'error': 'last valve change was too recent'}), 400
+        else:
+            SOLAR_VALVE.close_valve()
+            SOLAR_VALVE.delay = delay
 
     return jsonify({'data': standard_response()}), 201
 

@@ -15,23 +15,26 @@ class Config:
         self.temp_range_for_open= 20 # Default to 20
         self.temp_range_for_close = 0 # Default to 0
         self.max_temp_hit_date = date.today().replace(day=date.today().day - 1) # Default to yesterday
-        
+        self.user_request = {"settled": True, "valve": False, "delay": 0} # Default is "settled, off, no delay"
+
         # LOCAL CONFIG ONLY, NOT REMOTELY EDITABLE
         self.near_open_temp_diff = 1
 
         # DEPRECATED
         self.seconds_cal = 1 # default to 1
 
-        self._get_config()
+        self.get_config()
 
-    def _get_config(self):
-        """Get the current config file"""
+    def get_config(self):
+        """Get the current config file (on startup or change)"""
         self.config.read(self.filename)
         try:
             vars = self.config['var']
+            request = self.config['request']
         except KeyError:
             self._new_config_file()
             vars = self.config['var']
+            request = self.config['request']
             
         self.min_cycle_time = int(vars['min_cycle_time'])
         self.max_water_temp = int(vars['max_water_temp'])
@@ -39,6 +42,13 @@ class Config:
         self.temp_range_for_close = int(vars['temp_range_for_close'])
         self.seconds_cal = int(vars['seconds_cal'])
         self.max_temp_hit_date = datetime.strptime(vars['max_temp_hit_date'], "%Y-%m-%d").date()
+        
+        if request['settled'] == "True":
+            self.user_request = {"settled": True, "valve": False, "delay": 0}
+        else:
+            self.user_request['settled'] = False
+            self.user_request['valve'] = True if request['valve'] == "True" else False
+            self.user_request['delay'] = int(request['delay'])
     
     def _new_config_file(self):
         self.config = configparser.ConfigParser()
@@ -49,6 +59,11 @@ class Config:
         self.config.set('var', 'temp_range_for_close', str(self.temp_range_for_close))
         self.config.set('var', 'seconds_cal', str(self.seconds_cal))
         self.config.set('var', 'max_temp_hit_date', datetime.strftime(self.max_temp_hit_date,"%Y-%m-%d"))
+
+        self.config.add_section('request')
+        self.config.set('request', 'settled', "True")
+        self.config.set('request', 'valve', "False")
+        self.config.set('request', 'delay', "0")
 
         with open(self.filename, 'w') as configfile:
             self.config.write(configfile)
@@ -65,8 +80,15 @@ class Config:
         else:
             vars[setting] = str(num)
         self._set_config()
-        self._get_config()
+        self.get_config()
     
+    def settle_user_change(self):
+        """After user initiated valve change, adjust the config to settled"""
+        request = self.config['request']
+        request['settled'] = "True"
+        self._set_config()
+        self.get_config()
+
     def max_temp_today(self):
         """Returns True if max temp was hit today"""
         if self.max_temp_hit_date == date.today():

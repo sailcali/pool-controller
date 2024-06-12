@@ -97,6 +97,21 @@ def valve_logic():
         SOLAR_VALVE.close_valve()
         return True
 
+def check_user_option():
+    """Check the config file for a user requested valve change"""
+    CONFIG.get_config()
+    if not CONFIG.user_request['settled']:
+        new_valve = CONFIG.user_request['valve']
+        delay = CONFIG.user_request['delay']
+        if new_valve:
+            SOLAR_VALVE.open_valve(delay=delay)
+            CONFIG.settle_user_change()
+            return True
+        else:
+            SOLAR_VALVE.close_valve(delay=delay)
+            CONFIG.settle_user_change()
+            return False
+
 def standard_data():
     """Standard required info for server"""
     if SOLAR_VALVE.current_state() == 0:
@@ -128,8 +143,8 @@ def upload_data():
         
 if __name__ == "__main__":
     while True:
-
         try:
+            check_user_option()
             valve_logic()
         except Exception as error:
             ERRORS += 1
@@ -158,8 +173,13 @@ if __name__ == "__main__":
                 UPLOAD_ERRORS += 1
                 if UPLOAD_ERRORS > 20:
                     UPLOAD_FLAG = False
-        timer.sleep(1)
+        
+        timer.sleep(1) # One second between checks
+        
+        # Apply second counters
         UPLOAD_SECONDS += 1
+        SOLAR_VALVE.delay -= 1
+        SOLAR_VALVE.last_valve_change += 1
     
     # If loop broke
     logging(f'Too many errors, auto closing.')

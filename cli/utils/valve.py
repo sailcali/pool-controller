@@ -22,12 +22,16 @@ class Valve:
         """Returns 0 or 1 for valve position"""
         return GPIO.input(VALVE_PIN)
 
-    def open_valve(self):
+    def open_valve(self, delay=0):
         """Opens the valve if closed"""
         if self.current_state() == 0:
             # Open the valve
             GPIO.output(VALVE_PIN, True)
             
+            # Set user requested delay
+            if delay > 0:
+                self.delay = delay
+
             # Reset the triggers and notify
             self.last_valve_change = 0 # reset the last valve change timer
             self.near_open = False # Reset the near_open FOR DISCORD NOTIFICATION
@@ -36,12 +40,16 @@ class Valve:
         else:
             return False
             
-    def close_valve(self):
+    def close_valve(self, delay=0):
         """Closes the valve if open"""
         if self.current_state() == 1:
             # Open the valve
             GPIO.output(VALVE_PIN, False)
             
+            # Set user requested delay
+            if delay > 0:
+                self.delay = delay
+
             #Reset the triggers and notify
             self.last_valve_change = 0 # Reset the last valve change timer
             logging("Solar valve closed!")
