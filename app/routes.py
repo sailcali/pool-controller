@@ -22,9 +22,11 @@ def standard_response():
         max_hit_delay = 1
     else:
         max_hit_delay = 0
-    
-    backend_running = "active" in subprocess.check_output("systemctl is-active flask-app.service", shell=True).decode("utf-8")
-    
+    try:
+        subprocess.check_output("systemctl is-active flask-app.service", shell=True)
+        backend_running = True
+    except subprocess.CalledProcessError:
+        backend_running = False
     pump_on = datetime.now().time() >= PUMP_START and datetime.now().time() < PUMP_STOP
     return {"backend_running": backend_running, "pump_on": pump_on, "max_hit_delay": max_hit_delay, "temp_range": temp_range, "roof_temp": SENSORS['roof'].get_temp(), 
             "water_temp": SENSORS['water'].get_temp(), "valve": SOLAR_VALVE.current_state(), **CONFIG.data()}
