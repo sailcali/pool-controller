@@ -11,6 +11,7 @@ from utils.config import Config
 
 load_dotenv()
 
+SERVER_IP = "192.168.86.100"
 UPLOAD_SECONDS = 0
 UPLOAD_ERRORS = 0
 ERRORS = 0
@@ -136,7 +137,7 @@ def upload_data():
         if DEBUG:
             print(standard_data())
         else:
-            response = requests.post("http://192.168.86.205/pool/status", json={"data":standard_data()})
+            response = requests.post(SERVER_IP + "/pool/status", json={"data":standard_data()})
             if response.status_code != 201:
                 raise OSError
         return True
