@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from discordwebhook import Discord
 import os
-import commands
+import subprocess
 from datetime import datetime, time
 
 from . import SENSORS, SOLAR_VALVE, CONFIG
@@ -22,10 +22,9 @@ def standard_response():
         max_hit_delay = 1
     else:
         max_hit_delay = 0
-    backend_running = False
-    output = commands.getoutput('systemctl is-active flask-app.service')
-    if 'active' in output:
-        backend_running = True
+    
+    backend_running = "active" in subprocess.check_output("systemctl is-active flask-app.service", shell=True).decode("utf-8")
+    
     pump_on = datetime.now().time() >= PUMP_START and datetime.now().time() < PUMP_STOP
     return {"backend_running": backend_running, "pump_on": pump_on, "max_hit_delay": max_hit_delay, "temp_range": temp_range, "roof_temp": SENSORS['roof'].get_temp(), 
             "water_temp": SENSORS['water'].get_temp(), "valve": SOLAR_VALVE.current_state(), **CONFIG.data()}
