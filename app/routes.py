@@ -50,6 +50,9 @@ def change_valve():
         else:
             SOLAR_VALVE.close_valve(delay)
 
+    # Allow cli to flip relay
+    time.sleep(2)
+
     return jsonify({'data': standard_response()}), 201
 
 @pool_bp.route('/temp', methods=['POST'])
