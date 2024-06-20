@@ -44,7 +44,10 @@ DISCORD = Discord(url=DISCORD_POOL_URL)
 
 def logging(string=None):
         """Simple function for logging to discord, just send a string"""
-        DISCORD.post(content=string)
+        try:
+            DISCORD.post(content=string)
+        except ConnectionError:
+            pass
 
 def valve_logic():
     """Determine if valve should be open or closed"""
