@@ -1,19 +1,14 @@
 import configparser
 from datetime import datetime, date
-import os
-
-DEBUG = os.environ.get("FLASK_DEBUG")
-
-if DEBUG == "True":
-    FILENAME = "config/config.ini"
-else:
-    FILENAME = "/var/www/pool-controller/config/config.ini"
-
 
 class Config:
-    def __init__(self):
+    def __init__(self, debug):
         """Start with default values, then look for config file"""
         self.config = configparser.ConfigParser()
+        if debug:
+            self.filename = "config/config.ini"
+        else:
+            self.filename = "/var/www/pool-controller/config/config.ini"
         
         self.min_cycle_time = 90 # Default to 90
         self.max_water_temp = 82 # Default to 82
@@ -31,8 +26,8 @@ class Config:
         self.get_config()
 
     def get_config(self):
-        """Get the current config file"""
-        self.config.read(FILENAME)
+        """Get the current config file (on startup or change)"""
+        self.config.read(self.filename)
         try:
             vars = self.config['var']
             request = self.config['request']
@@ -70,16 +65,15 @@ class Config:
         self.config.set('request', 'valve', "False")
         self.config.set('request', 'delay', "0")
 
-        with open(FILENAME, 'w') as configfile:
+        with open(self.filename, 'w') as configfile:
             self.config.write(configfile)
 
     def _set_config(self):
-        with open(FILENAME, 'w') as configfile:
+        with open(self.filename, 'w') as configfile:
             self.config.write(configfile)
 
     def change_setting(self, setting=None, num=None, max_temp_hit=None):
         """Change one of the variables in the config file. Requires setting string and new setting number"""
-        self.get_config()
         vars = self.config['var']
         if max_temp_hit is not None:
             vars['max_temp_hit_date'] = datetime.strftime(date.today(),"%Y-%m-%d")
@@ -88,13 +82,10 @@ class Config:
         self._set_config()
         self.get_config()
     
-    def request_user_change(self,valve=False,delay=0):
-        """Request user implemented valve change"""
-        self.get_config()
+    def settle_user_change(self):
+        """After user initiated valve change, adjust the config to settled"""
         request = self.config['request']
-        request['settled'] = "False"
-        request['valve'] = str(valve)
-        request['delay'] = str(delay)
+        request['settled'] = "True"
         self._set_config()
         self.get_config()
 
@@ -106,6 +97,5 @@ class Config:
             return False
 
     def data(self):
-        self.get_config()
         return {"set_temp": self.max_water_temp, "min_cycle_time": self.min_cycle_time, "temp_range_for_open": self.temp_range_for_open,
                 "temp_range_for_close": self.temp_range_for_close, "seconds_cal": self.seconds_cal, "max_temp_hit_date": self.max_temp_hit_date}
